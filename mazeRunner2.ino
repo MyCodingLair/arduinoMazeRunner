@@ -14,11 +14,6 @@
 
 
 
-
-
-
-
-
   void setup() {
 
     Serial.begin(9600);
@@ -31,7 +26,7 @@
     pinMode(3, INPUT);
 
     //set motor speed
-    motor.setSpeed(200);
+    motor.setSpeed(220);  //left motor is a little bit slower than the right motor, so set the speed a litlle bit higer
     motor2.setSpeed(200);
 
     Serial.begin(9600); // Starts the serial communication
@@ -63,56 +58,49 @@
     Serial.print("bool Right"); Serial.println(junctionRight());
     Serial.print("bool Left"); Serial.println(junctionLeft());
     delay(1000);
-    
 
 
 
 
-if(straightLine() == true)
+
+  if(straightLine() == true)
   {
     forward();
   }
   else if (outOfBoundToRight() == true)
   {
       leftTurn();
-     
   }
   else if (outOfBoundToLeft() == true)
   {
-      rightTurn();     
+      rightTurn();
+  }
+  else if(junctionRight() == true)
+  {
+    enterRightJunction();
   }
 
-else if(foundJunction() == true)
-{
-  enterJunction();
-}
-else if(endOfLine() == true)
-{
-  turnAround();
-}
-else if(tJunction() == true)
-{
-  enterRightJunction();
-}
-else
-{
-  turnAround();
-}
+  else if (junctionLeft()==true)
+  {
+    enterLeftJunction();
+  }
+  else if(endOfLine() == true)
+  {
+    stopMotor();
+    turnAround();
+  }
+  else if(tJunction() == true)
+  {
+    enterRightJunction();
+  }
+  else
+  {
+    turnAround();
+  }
 
 
 
 
-
-
-
-
-
-
-
-
-
-
-    
 
   }  //end loop()
 
@@ -122,12 +110,12 @@ else
   //============================Sensing============================
 
   bool junctionRight(){
-    
+
     // 1/true == RIGHT
     // 0/FALSE == LEFT
       if( (analogRead(0)>500) && (analogRead(1)>500) && (analogRead(2)>500) && (analogRead(3)<100) )
       {   //right junction detected
-      
+
       return true;
       }
       else
@@ -138,8 +126,8 @@ else
 
 bool junctionLeft(){
   if(   (analogRead(3)>500) && (analogRead(1)>500) && (analogRead(2)>500) && (analogRead(0)<100) )
-  {  //left junction detected   
-    return true; 
+  {  //left junction detected
+    return true;
   }
   else
   {
@@ -170,7 +158,7 @@ bool foundJunction(){
 
   }
 
-  bool outOfBoundToLeft(){  
+  bool outOfBoundToLeft(){
     if ( (analogRead(3)&&analogRead(2) < 100) && (analogRead(0)&&analogRead(1) > 500)  ){
 
       return true;
@@ -213,27 +201,33 @@ bool foundJunction(){
 
 //============================Entering Junction============================
 
+
+void enterRightJunction()
+{
+  stopMotor();
+  while(!straightLine())
+  {
+    rightTurn();
+  }
+}
+
   void enterLeftJunction()
   {
+    stopMotor();
     while(!straightLine())
     {
       leftTurn();
-    }   
+    }
   }
 
-  void enterRightJunction(){
-    while(!straightLine())
-    {
-      rightTurn();
-    }    
-  }
+
 
   //============================Entering Junction============================
 
 
 
 
-  //============================Decision============================    
+  //============================Decision============================
   //============================Decision============================
 
 
@@ -314,8 +308,3 @@ void enterJunction()
 }
 
   //============================Movement============================
-
-
-  
-
-
